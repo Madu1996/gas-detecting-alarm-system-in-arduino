@@ -1,0 +1,227 @@
+On button = 16580863;
+Off button = 16597183;
+
+#include <IRremote.h>
+#include <Servo.h>
+Servo myservo;
+
+IRrecv irSensor(11);
+decode_results results;
+
+void setup()
+{
+  Serial.begin(9600);
+  irSensor.enableIRIn();
+  pinMode(6,OUTPUT);
+  pinMode(5,OUTPUT);
+}
+
+void loop()
+{
+  if(irSensor.decode(&results)){
+    Serial.println(results.value, DEC);
+    irSensor.resume();
+  }
+  delay(100);
+  
+  long val = results.value;
+  
+  if(val == 16580863){
+    digitalWrite(6,HIGH);
+  }
+  if(val == 16597183){
+    digitalWrite(6,LOW);
+  }
+  delay(100);
+  
+}
+
+
+
+
+#include <IRremote.h>
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(5,6,8,9,10,11);
+int RECV_PIN = 7;
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+
+int redLed = 2;
+int greenLed = 3;
+int buzzer = 4;
+int sensor = A0;
+int sensorThresh = 350;
+int fan=12;
+
+
+void setup(){
+  pinMode(redLed, OUTPUT);
+  pinMode(greenLed,OUTPUT);
+  pinMode(buzzer,OUTPUT);
+  pinMode(fan,OUTPUT);
+  pinMode(sensor,INPUT);
+  Serial.begin(9600);
+  lcd.begin(16,2);
+  irrecv.enableIRIn();
+  }
+
+void loop(){
+  int analogValue = analogRead(sensor);
+  
+  if(analogValue>sensorThresh){
+    digitalWrite(redLed,HIGH);
+    digitalWrite(greenLed,LOW);
+    digitalWrite(buzzer,HIGH);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("WARNING");
+    delay(1000);
+    lcd.clear();
+    lcd.setCursor(0,1);
+    lcd.print("GAS DETECTING");
+    delay(1000);
+    if (irrecv.decode(&results)) {
+    Serial.println(results.value);
+      if (results.value == 16580863){
+        digitalWrite(fan,HIGH);
+      }
+      irrecv.resume();
+    }
+  }else{
+    digitalWrite(greenLed,HIGH);
+    digitalWrite(redLed,LOW);
+    digitalWrite(buzzer,LOW);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("SAFE");
+    delay(1000);
+    lcd.clear();
+    lcd.setCursor(0,1);
+    lcd.print("ALL CLEAR");
+    delay(1000);
+    digitalWrite(fan,LOW);
+  }
+}
+
+
+
+
+void myTone(byte pin, uint16_t frequency, uint16_t duration)
+{ // input parameters: Arduino pin number, frequency in Hz, duration in milliseconds
+  unsigned long startTime=millis();
+  unsigned long halfPeriod= 1000000L/frequency/2;
+  pinMode(pin,OUTPUT);
+  while (millis()-startTime< duration)
+  {
+    digitalWrite(pin,HIGH);
+    delayMicroseconds(halfPeriod);
+    digitalWrite(pin,LOW);
+    delayMicroseconds(halfPeriod);
+  }
+  pinMode(pin,INPUT);
+}
+
+void setup() {
+}
+
+void loop() {
+  myTone(8,1000, 2000); // tone on pin-8 with 1000 Hz for 2000 milliseconds
+  delay(5000);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <IRremote.h>
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(5,6,8,9,10,11);
+int IR_PIN = 7;
+IRrecv irrecv(IR_PIN);
+decode_results results;
+
+
+int redLed = 2;
+int greenLed = 3;
+int buzzer = 4;
+int gas_sensor = A0;
+int sensorThresh = 350;
+int fan=12;
+
+
+void setup(){
+  pinMode(redLed, OUTPUT);
+  pinMode(greenLed,OUTPUT);
+  pinMode(buzzer,OUTPUT);
+  pinMode(fan,OUTPUT);
+  pinMode(gas_sensor,INPUT);
+  Serial.begin(9600);
+  lcd.begin(16,2);
+  irrecv.enableIRIn();
+  }
+
+void loop(){
+  int analogValue = analogRead(gas_sensor);
+  
+  if(analogValue>sensorThresh){
+    digitalWrite(redLed,HIGH);
+    digitalWrite(greenLed,LOW);
+    digitalWrite(buzzer,HIGH);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("WARNING");
+    delay(1000);
+    lcd.clear();
+    lcd.setCursor(0,1);
+    lcd.print("GAS DETECTING");
+    delay(1000);
+    if (irrecv.decode(&results)) {
+    Serial.println(results.value);
+      if (results.value == 16580863){
+        digitalWrite(fan,HIGH);
+      }
+      irrecv.resume();
+    }
+  }else{
+    digitalWrite(greenLed,HIGH);
+    digitalWrite(redLed,LOW);
+    digitalWrite(buzzer,LOW);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("SAFE");
+    delay(1000);
+    lcd.clear();
+    lcd.setCursor(0,1);
+    lcd.print("ALL CLEAR");
+    delay(1000);
+    digitalWrite(fan,LOW);
+  }
+}
